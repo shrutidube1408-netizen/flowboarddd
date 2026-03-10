@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>FlowBoard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; } /*basics applied to all*/
+
+    
+    :root { /* to call colours- basic colour palate of the website & root- dict of nickanmes for clours*/
+      --bg:        #f5f0e8;   
+      --surface:   #fdfaf5;   
+      --surface2:  #f0ebe0;   
+      --border:    #e0d8cc;   
+      --text:      #2c2820;   
+      --muted:     #9e9080;   
+      --accent:    #7c6f5a;   
+      --accent2:   #c4956a;   
+      --green:     #6b8f71;   
+      --red:       #b5695a;   
+      --gold:      #c4956a;
+      --radius:    10px;
+      --radius-sm: 6px;
+      --shadow:    0 1px 8px rgba(44,40,32,0.07);
+      --shadow-md: 0 4px 20px rgba(44,40,32,0.10);
+    }
+
+    
+    body.dark {
+      --bg:       #1c1a16;
+      --surface:  #242018;
+      --surface2: #2e2a22;
+      --border:   #3a352c;
+      --text:     #f0e8d8;
+      --muted:    #7a7060;
+      --accent:   #c4a882;
+      --accent2:  #d4956a;
+      --shadow:   0 1px 8px rgba(0,0,0,0.25);
+      --shadow-md:0 4px 20px rgba(0,0,0,0.35);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Jost', sans-serif;
+      color: var(--text);
+      font-weight: 400;
+      min-height: 100vh;
+      transition: background 0.4s, color 0.4s; /* makes hover effects smooth*/
+    }
+
+    
+    #header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 58px;
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 20px;
+      position: sticky; /*makes the header stick to top when scrolled*/
+      top: 0;
+      z-index: 200; /* higher the number more in front*/
+    }
+
+    #header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+    }
+
+    
+    .hdivider {
+      width: 1px;
+      height: 22px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    
+    .xp-bar-wrap {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 240px;
+    }
+    .xp-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+    .xp-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .xp-fill {
+      height: 100%;
+      background: var(--accent2);
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1); /* makes hover effects smooth*/
+    }
+
+    
+    .streak-pill {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent2);
+      background: rgba(196,149,106,0.1);
+      border: 1px solid rgba(196,149,106,0.25);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hbtn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'Jost', sans-serif;
+      letter-spacing: 0.3px;
+      transition: background 0.2s, border-color 0.2s; /* makes hover effects smooth*/
+      white-space: nowrap;
+    }
+    .hbtn:hover { background: var(--surface2); border-color: var(--accent); }
+
+    .hbtn.primary {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .hbtn.primary:hover { opacity: 0.8; }
+
+#app {
+  display: grid; /* splits area into two */
+  grid-template-columns: 262px 1fr;
+  min-height: calc(100vh - 58px);
+}
+
+    
+    #sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex; /*flex- keeps horizontally in a row*/
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--bg);
+    }
+
+    .panel-title {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    
+    .pomo-display { text-align: center; }
+
+    .pomo-mode {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 4px;
+    }
+
+    .pomo-time {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pomo-dots {
+      display: flex; /*flex- keeps horizontally in a row*/
+      justify-content: center;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .pomo-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s; /* makes hover effects smooth*/
+    }
+    .pomo-dot.done { background: var(--accent2); }
+
+    .pomo-btns {
+      display: flex; /*flex- keeps horizontally in a row*/
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .pomo-btn {
+      flex: 1;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 9px 0;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'Jost', sans-serif;
+      letter-spacing: 0.4px;
+      transition: opacity 0.2s; /* makes hover effects smooth*/
+    }
+    .pomo-btn:hover { opacity: 0.75; }
+    .pomo-btn.ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .pomo-btn.ghost:hover { background: var(--surface2); opacity: 1; }
+
+    
+    .stats-grid {
+      display: grid; /* splits area into two */
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    
+    .reward-item {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 6px;
+    }
+    .reward-name { font-size: 12px; font-weight: 400; flex: 1; color: var(--text); }
+    .reward-cost {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent2);
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .reward-claim {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'Jost', sans-serif;
+      transition: opacity 0.2s; /* makes hover effects smooth*/
+    }
+    .reward-claim:hover { opacity: 0.7; }
+    .reward-claim:disabled {
+      background: var(--border);
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: 1;
+    }
+    .reward-del {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s; /* makes hover effects smooth*/
+    }
+    .reward-del:hover { color: var(--red); }
+
+    .add-reward-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .add-reward-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .mini-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-family: 'Jost', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      margin-bottom: 6px;
+      transition: border-color 0.2s; /* makes hover effects smooth*/
+    }
+    .mini-input:focus { border-color: var(--accent); }
+    .mini-input::placeholder { color: var(--muted); }
+    .mini-row { display: flex; gap: 6px; } /*flex- keeps horizontally in a row*/
+    .mini-add-btn {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Jost', sans-serif;
+      transition: opacity 0.2s; /* makes hover effects smooth*/
+      white-space: nowrap;
+    }
+    .mini-add-btn:hover { opacity: 0.75; }
+
+    
+    #board-area {
+      padding: 24px;
+      overflow-x: auto;
+      min-width: 0;
+    }
+
+    #board {
+      display: flex; /*flex- keeps horizontally in a row*/
+      flex-direction: row;
+      gap: 16px;
+      align-items: flex-start;
+      min-height: calc(100vh - 106px);
+      min-width: 540px;
+    }
+
+    
+    .column {
+      flex: 1;
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      transition: background 0.3s, border-color 0.2s; /* makes hover effects smooth*/
+    }
+
+    .column.drag-over {
+      border-color: var(--accent2);
+      background: rgba(196,149,106,0.04);
+    }
+
+    .column-header {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .col-label {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 8px;
+    }
+
+    
+    .col-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    #todo-column     .col-dot { background: var(--accent); }
+    #progress-column .col-dot { background: var(--accent2); }
+    #done-column     .col-dot { background: var(--green); }
+
+    .column-header h2 {
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .col-count {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1px 8px;
+      border-radius: 10px;
+    }
+
+    .cards-container { min-height: 48px; }
+
+    
+    .task-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 13px 13px 10px;
+      margin-bottom: 8px;
+      cursor: grab; /* converts pointer to grab*/
+      position: relative;
+      transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s; /* makes hover effects smooth*/
+      animation: fadeUp 0.2s ease;
+    }
+
+    @keyframes fadeUp {  /* creates animation*/
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .task-card.dragging { opacity: 0.3; transform: scale(1.01); }
+
+    
+    .task-card::before { /* the thin coloured priority stripe*/
+      content: '';
+      position: absolute;
+      left: 0; top: 10px; bottom: 10px;
+      width: 2px;
+      border-radius: 2px;
+    }
+    .task-card[data-priority="high"]::before   { background: rgb(172, 6, 6); }
+      content: '';
+    .task-card[data-priority="medium"]::before { background: var(--accent2); }
+    .task-card[data-priority="low"]::before    { background: var(--green); }
+
+    .card-top {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .card-actions {
+      display: flex; /*flex- keeps horizontally in a row*/
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.15s; /* makes hover effects smooth*/
+      flex-shrink: 0;
+    }
+    .task-card:hover .card-actions { opacity: 1; }
+
+    .card-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 3px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+    }
+    .card-btn:hover { background: var(--surface2); color: var(--text); }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.55;
+      font-weight: 300;
+    }
+
+    
+    .subtask-list {
+      margin-top: 10px;
+      display: flex; /*flex- keeps horizontally in a row*/
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .subtask-item {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text);
+      cursor: pointer;
+      padding: 3px 2px;
+      border-radius: 4px;
+      transition: background 0.1s; /* makes hover effects smooth*/
+    }
+    .subtask-item:hover { background: var(--surface2); }
+
+    .subtask-item input[type="checkbox"] { display: none; }
+
+    .subtask-check {
+      width: 13px; height: 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 3px;
+      flex-shrink: 0;
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s; /* makes hover effects smooth*/
+      background: var(--surface);
+    }
+    .subtask-item.checked .subtask-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .subtask-item.checked .subtask-check::after {
+      content: '✓';
+      color: var(--bg);
+      font-size: 8px;
+      font-weight: 700;
+    }
+    .subtask-item.checked .subtask-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .subtask-progress {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .subtask-progress-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      transition: width 0.35s ease; /* makes hover effects smooth*/
+    }
+
+    .add-subtask-row {
+      display: flex; /*flex- keeps horizontally in a row*/
+      gap: 5px;
+      margin-top: 9px;
+    }
+    .add-subtask-row input {
+      flex: 1;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      outline: none;
+      transition: border-color 0.2s; /* makes hover effects smooth*/
+    }
+    .add-subtask-row input:focus { border-color: var(--accent); }
+    .add-subtask-row input::placeholder { color: var(--muted); }
+    .add-subtask-row button {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 9px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      line-height: 1;
+      transition: background 0.15s, color 0.15s; /* makes hover effects smooth*/
+    }
+    .add-subtask-row button:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+    
+    .card-footer {
+      display: flex; /*flex- keeps horizontally in a row*/
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 9px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .priority-badge {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+    .priority-high   { background: rgba(181,105,90,0.1);  color: var(--red); }
+    .priority-medium { background: rgba(196,149,106,0.1); color: var(--accent2); }
+    .priority-low    { background: rgba(107,143,113,0.1); color: var(--green); }
+
+    .card-xp {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--accent2);
+      letter-spacing: 0.2px;
+    }
+
+    
+    .empty-state {
+      text-align: center;
+      padding: 28px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+    }
+    .empty-state .emoji { font-size: 22px; margin-bottom: 7px; display: block; }
+
+    
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44,40,32,0.35);
+      z-index: 300; /* higher the number more in front*/
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 420px;
+      max-width: calc(100vw - 28px);
+      box-shadow: var(--shadow-md);
+      z-index: 400; /* higher the number more in front*/
+      animation: modalIn 0.22s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes modalIn {
+      from { opacity:0; transform: translate(-50%,-47%) scale(0.97); }
+      to   { opacity:1; transform: translate(-50%,-50%) scale(1); }
+    }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 22px;
+      color: var(--text);
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s; /* makes hover effects smooth*/
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--accent); }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--muted); }
+    .form-group textarea { height: 72px; resize: vertical; }
+
+    .modal-btns {
+      display: flex;  /*flex- keeps horizontally in a row*/
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Jost', sans-serif;
+      letter-spacing: 0.5px;
+      flex: 1;
+      transition: opacity 0.2s; /* makes hover effects smooth*/
+    }
+    .btn-primary:hover { opacity: 0.75; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Jost', sans-serif;
+      transition: background 0.2s; /* makes hover effects smooth*/
+    }
+    .btn-secondary:hover { background: var(--surface2); }
+
+    
+    .xp-toast {
+      position: fixed;
+      bottom: 70px;
+      right: 24px;
+      background: var(--text);
+      color: var(--bg);
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 30px;
+      z-index: 999; /* higher the number more in front*/
+      pointer-events: none;
+      animation: toastFloat 2.2s ease forwards;
+    }
+
+    @keyframes toastFloat {
+      0%   { opacity:0; transform: translateY(0); }
+      15%  { opacity:1; transform: translateY(-8px); }
+      75%  { opacity:1; transform: translateY(-24px); }
+      100% { opacity:0; transform: translateY(-44px); }
+    }
+
+    
+    @media (max-width: 768px) {
+      #app { grid-template-columns: 1fr; }
+      #sidebar { display: none; }
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <h1>flowboard</h1>
+  <div class="hdivider"></div>
+
+  <div class="xp-bar-wrap">
+    <span class="xp-label" id="xpLabel">0 xp</span>
+    <div class="xp-track">
+      <div class="xp-fill" id="xpFill" style="width:0%"></div>
+    </div>
+    <span class="xp-label" id="xpLevel">lv 1</span>
+  </div>
+
+  <div class="streak-pill">🔥 <span id="streakCount">0</span> day streak</div>
+
+  <div class="header-right">
+    <button class="hbtn" onclick="toggleTheme()" id="themeBtn">◐</button>
+    <button class="hbtn primary" onclick="openTaskModal()">+ new task</button>
+  </div>
+</div>
+
+<div id="app">
+  <div id="sidebar">
+    <div class="panel">
+      <div class="panel-title">Daily Spark</div>
+      <div id="quoteText" style="font-size:12px;line-height:1.7;color:var(--text);font-style:italic;font-family:'Playfair Display',serif;margin-bottom:10px;">Click below for a spark of motivation.</div>
+      <div id="quoteAuthor" style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;"></div>
+      <button class="pomo-btn ghost" onclick="newQuote()" style="width:100%;">New quote</button>
+    </div>
+
+    
+    <div class="panel">
+      <div class="panel-title">Focus Timer</div>
+      <div class="pomo-display">
+        <div class="pomo-mode" id="pomoMode">Work</div>
+        <div class="pomo-time" id="pomoTime">25:00</div>
+      </div>
+      <div class="pomo-dots" id="pomoDots">
+        <div class="pomo-dot"></div>
+        <div class="pomo-dot"></div>
+        <div class="pomo-dot"></div>
+        <div class="pomo-dot"></div>
+      </div>
+      <div class="pomo-btns">
+        <button class="pomo-btn" id="pomoStartBtn" onclick="togglePomodoro()">Start</button>
+        <button class="pomo-btn ghost" onclick="resetPomodoro()">Reset</button>
+      </div>
+    </div>
+
+    
+    <div class="panel">
+      <div class="panel-title">Stats</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="statXP">0</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statStreak">0</div>
+          <div class="stat-label">Streak</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statDone">0</div>
+          <div class="stat-label">Done</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statPomos">0</div>
+          <div class="stat-label">Pomos</div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  
+  <div id="board-area">
+    <div id="board">
+
+      <div class="column" id="todo-column"
+           ondragover="onDragOver(event)" ondrop="onDrop(event,'todo')" ondragleave="onDragLeave(event)">
+        <div class="column-header">
+          <div class="col-label">
+            <div class="col-dot"></div>
+            <h2>To Do</h2>
+          </div>
+          <span class="col-count" id="todo-count">0</span>
+        </div>
+        <div class="cards-container" id="todo-cards"></div>
+      </div>
+
+      <div class="column" id="progress-column"
+           ondragover="onDragOver(event)" ondrop="onDrop(event,'progress')" ondragleave="onDragLeave(event)">
+        <div class="column-header">
+          <div class="col-label">
+            <div class="col-dot"></div>
+            <h2>In Progress</h2>
+          </div>
+          <span class="col-count" id="progress-count">0</span>
+        </div>
+        <div class="cards-container" id="progress-cards"></div>
+      </div>
+
+      <div class="column" id="done-column"
+           ondragover="onDragOver(event)" ondrop="onDrop(event,'done')" ondragleave="onDragLeave(event)">
+        <div class="column-header">
+          <div class="col-label">
+            <div class="col-dot"></div>
+            <h2>Done</h2>
+          </div>
+          <span class="col-count" id="done-count">0</span>
+        </div>
+        <div class="cards-container" id="done-cards"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div id="overlay" onclick="closeAllModals()"></div>
+
+<div class="modal" id="taskModal">
+  <h2 id="taskModalTitle">New task</h2>
+  <div class="form-group">
+    <label>Title</label>
+    <input type="text" id="taskTitle" placeholder="What needs to be done?">
+  </div>
+  <div class="form-group">
+    <label>Description</label>
+    <textarea id="taskDesc" placeholder="Optional notes…"></textarea>
+  </div>
+  <div class="form-group">
+    <label>Priority</label>
+    <select id="taskPriority">
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+      <option value="low">Low</option>
+    </select>
+  </div>
+  <div class="modal-btns">
+    <button class="btn-secondary" onclick="closeAllModals()">Cancel</button>
+    <button class="btn-primary" onclick="saveTask()">Save task</button>
+  </div>
+</div>
+
+<script>
+
+let tasks   = JSON.parse(localStorage.getItem("kb-tasks")   || "[]");
+let game    = JSON.parse(localStorage.getItem("kb-game")    || JSON.stringify({ xp:0, level:1, streak:0, lastActiveDate:"", totalDone:0, pomosCompleted:0 }));
+
+let editingTaskId = null;
+let draggedId     = null;
+
+function saveTasks()   { localStorage.setItem("kb-tasks",   JSON.stringify(tasks));   }
+function saveGame()    { localStorage.setItem("kb-game",    JSON.stringify(game));    }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+const XP_PER_LEVEL = 100;
+
+function addXP(amount) {
+  game.xp += amount;
+  let newLevel = Math.floor(game.xp / XP_PER_LEVEL) + 1;
+  if (newLevel > game.level) {
+    game.level = newLevel;
+    setTimeout(() => showXpToast("Level " + newLevel + " ✦"), 500);
+  }
+  saveGame();
+  updateXpBar();
+  showXpToast("+" + amount + " xp");
+}
+
+function updateXpBar() {
+  let pct = (game.xp % XP_PER_LEVEL) / XP_PER_LEVEL * 100;
+  document.getElementById("xpFill").style.width   = pct + "%";
+  document.getElementById("xpLabel").textContent  = game.xp + " xp";
+  document.getElementById("xpLevel").textContent  = "lv " + game.level;
+  document.getElementById("statXP").textContent   = game.xp;
+  document.getElementById("statStreak").textContent = game.streak;
+  document.getElementById("statDone").textContent = game.totalDone;
+  document.getElementById("statPomos").textContent = game.pomosCompleted;
+  document.getElementById("streakCount").textContent = game.streak;
+}
+
+function showXpToast(text) {
+  let t = document.createElement("div");
+  t.className = "xp-toast";
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+function updateStreak() {
+  let today     = new Date().toDateString();
+  let yesterday = new Date(Date.now() - 86400000).toDateString();
+  if      (game.lastActiveDate === today)     return;
+  else if (game.lastActiveDate === yesterday) game.streak++;
+  else                                        game.streak = 1;
+  game.lastActiveDate = today;
+  saveGame();
+  updateXpBar();
+}
+
+let pomo = { seconds:25*60, running:false, isWork:true, sessionsDone:0, intervalId:null };
+
+function togglePomodoro() {
+  if (pomo.running) {
+    clearInterval(pomo.intervalId);
+    pomo.running = false;
+    document.getElementById("pomoStartBtn").textContent = "Start";
+  } else {
+    pomo.running = true;
+    document.getElementById("pomoStartBtn").textContent = "Pause";
+    pomo.intervalId = setInterval(() => {
+      pomo.seconds--;
+      renderPomoDisplay();
+      if (pomo.seconds <= 0) {
+        clearInterval(pomo.intervalId);
+        pomo.running = false;
+        document.getElementById("pomoStartBtn").textContent = "Start";
+        onPomoComplete();
+      }
+    }, 1000);
+  }
+}
+
+function onPomoComplete() {
+  if (pomo.isWork) {
+    pomo.sessionsDone++;
+    game.pomosCompleted++;
+    saveGame();
+    addXP(10);
+    updateStreak();
+    renderPomoDots();
+    if (pomo.sessionsDone >= 4) {
+      pomo.isWork = false; pomo.seconds = 15*60; pomo.sessionsDone = 0;
+      document.getElementById("pomoMode").textContent = "Long break";
+      alert("4 sessions done — take a 15 min break!");
+    } else {
+      pomo.isWork = false; pomo.seconds = 5*60;
+      document.getElementById("pomoMode").textContent = "Break";
+      alert("Session done — 5 min break.");
+    }
+  } else {
+    pomo.isWork = true; pomo.seconds = 25*60;
+    document.getElementById("pomoMode").textContent = "Work";
+    alert("Break over — back to focus.");
+  }
+  renderPomoDisplay();
+}
+
+function resetPomodoro() {
+  clearInterval(pomo.intervalId);
+  pomo = { seconds:25*60, running:false, isWork:true, sessionsDone:0, intervalId:null };
+  document.getElementById("pomoMode").textContent = "Work";
+  document.getElementById("pomoStartBtn").textContent = "Start";
+  renderPomoDisplay(); renderPomoDots();
+}
+
+function renderPomoDisplay() {
+  let m = Math.floor(pomo.seconds / 60);
+  let s = pomo.seconds % 60;
+  document.getElementById("pomoTime").textContent =
+    String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+}
+
+function renderPomoDots() {
+  document.querySelectorAll(".pomo-dot").forEach((d,i) =>
+    d.classList.toggle("done", i < pomo.sessionsDone));
+}
+
+function openTaskModal(taskId = null) {
+  editingTaskId = taskId;
+  if (taskId) {
+    let t = tasks.find(t => t.id === taskId);
+    document.getElementById("taskModalTitle").textContent = "Edit task";
+    document.getElementById("taskTitle").value    = t.title;
+    document.getElementById("taskDesc").value     = t.desc;
+    document.getElementById("taskPriority").value = t.priority;
+  } else {
+    document.getElementById("taskModalTitle").textContent = "New task";
+    document.getElementById("taskTitle").value    = "";
+    document.getElementById("taskDesc").value     = "";
+    document.getElementById("taskPriority").value = "medium";
+  }
+  document.getElementById("taskModal").style.display  = "block";
+  document.getElementById("overlay").style.display    = "block";
+  document.getElementById("taskTitle").focus();
+}
+
+function closeAllModals() {
+  document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+  document.getElementById("overlay").style.display = "none";
+  editingTaskId = null;
+}
+
+function saveTask() {
+  let title = document.getElementById("taskTitle").value.trim();
+  if (!title) { alert("Please enter a title."); return; }
+  if (editingTaskId) {
+    let t = tasks.find(t => t.id === editingTaskId);
+    t.title    = title;
+    t.desc     = document.getElementById("taskDesc").value.trim();
+    t.priority = document.getElementById("taskPriority").value;
+  } else {
+    tasks.push({ id:uid(), title, desc:document.getElementById("taskDesc").value.trim(),
+      priority:document.getElementById("taskPriority").value,
+      column:"todo", subtasks:[], createdAt:new Date().toLocaleDateString() });
+    addXP(5);
+  }
+  saveTasks(); renderAll(); closeAllModals();
+}
+
+function addSubtask(taskId, inputEl) {
+  let text = inputEl.value.trim();
+  if (!text) return;
+  tasks.find(t => t.id === taskId).subtasks.push({ id:uid(), text, done:false });
+  inputEl.value = "";
+  saveTasks(); renderAll();
+}
+
+function toggleSubtask(taskId, subId) {
+  let task = tasks.find(t => t.id === taskId);
+  let sub  = task.subtasks.find(s => s.id === subId);
+  sub.done = !sub.done;
+  if (task.subtasks.length > 0 && task.subtasks.every(s => s.done)) {
+    task.column = "done";
+    completeTask(task);
+  }
+  saveTasks(); renderAll();
+}
+
+function deleteSubtask(taskId, subId) {
+  let task = tasks.find(t => t.id === taskId);
+  task.subtasks = task.subtasks.filter(s => s.id !== subId);
+  saveTasks(); renderAll();
+}
+
+function completeTask(task) {
+  game.totalDone++;
+  saveGame();
+  updateStreak();
+  let xpMap = { high:30, medium:20, low:10 };
+  addXP(xpMap[task.priority] || 20);
+  updateXpBar();
+}
+
+function deleteTask(taskId) {
+  tasks = tasks.filter(t => t.id !== taskId);
+  saveTasks(); renderAll();
+}
+
+function onDragStart(e, id) { draggedId = id; setTimeout(() => e.target.classList.add("dragging"), 0); }
+function onDragEnd(e)       { e.target.classList.remove("dragging"); draggedId = null; document.querySelectorAll(".column").forEach(c => c.classList.remove("drag-over")); }
+function onDragOver(e)      { e.preventDefault(); e.currentTarget.classList.add("drag-over"); }
+function onDragLeave(e)     { e.currentTarget.classList.remove("drag-over"); }
+function onDrop(e, col) {
+  e.currentTarget.classList.remove("drag-over");
+  if (!draggedId) return;
+  let task = tasks.find(t => t.id === draggedId);
+  if (!task) return;
+  let wasNotDone = task.column !== "done";
+  task.column = col;
+  if (col === "done" && wasNotDone) completeTask(task);
+  saveTasks(); renderAll();
+}
+
+function renderAll() {
+  ["todo","progress","done"].forEach(col => {
+    let container = document.getElementById(col + "-cards");
+    let colTasks  = tasks.filter(t => t.column === col);
+    document.getElementById(col + "-count").textContent = colTasks.length;
+
+    if (!colTasks.length) {
+      container.innerHTML = `<div class="empty-state"><span class="emoji">·</span>nothing here yet</div>`;
+      return;
+    }
+
+    container.innerHTML = colTasks.map(task => {
+      let subHTML = "";
+      if (task.subtasks && task.subtasks.length) {
+        let done = task.subtasks.filter(s => s.done).length;
+        let pct  = (done / task.subtasks.length) * 100;
+        let items = task.subtasks.map(sub => `
+          <div class="subtask-item ${sub.done ? "checked" : ""}" onclick="toggleSubtask('${task.id}','${sub.id}')">
+            <div class="subtask-check"></div>
+            <span class="subtask-text">${escapeHtml(sub.text)}</span>
+            <button class="card-btn" style="margin-left:auto" onclick="event.stopPropagation();deleteSubtask('${task.id}','${sub.id}')">×</button>
+          </div>`).join("");
+        subHTML = `<div class="subtask-list">${items}</div>
+                   <div class="subtask-progress"><div class="subtask-progress-fill" style="width:${pct}%"></div></div>`;
+      }
+
+      let xpMap = { high:30, medium:20, low:10 };
+
+      return `
+        <div class="task-card" data-priority="${task.priority}" draggable="true"
+             ondragstart="onDragStart(event,'${task.id}')" ondragend="onDragEnd(event)">
+          <div class="card-top">
+            <div class="card-title">${escapeHtml(task.title)}</div>
+            <div class="card-actions">
+              <button class="card-btn" onclick="openTaskModal('${task.id}')">✎</button>
+              <button class="card-btn" onclick="deleteTask('${task.id}')">×</button>
+            </div>
+          </div>
+          ${task.desc ? `<div class="card-desc">${escapeHtml(task.desc)}</div>` : ""}
+          ${subHTML}
+          <div class="add-subtask-row">
+            <input type="text" id="st-${task.id}" placeholder="add subtask…"
+                   onkeydown="if(event.key==='Enter') addSubtask('${task.id}',this)">
+            <button onclick="addSubtask('${task.id}',document.getElementById('st-${task.id}'))">+</button>
+          </div>
+          <div class="card-footer">
+            <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+            <span class="card-xp">+${xpMap[task.priority]||20} xp</span>
+          </div>
+        </div>`;
+    }).join("");
+  });
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function toggleTheme() {
+  let dark = document.body.classList.toggle("dark");
+  localStorage.setItem("kb-theme", dark ? "dark" : "light");
+}
+if (localStorage.getItem("kb-theme") === "dark") document.body.classList.add("dark");
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeAllModals(); });
+document.getElementById("taskTitle").addEventListener("keydown", e => { if (e.key === "Enter") saveTask(); });
+
+const quotes = [
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { text: "The harder I work, the luckier I get.", author: "Samuel Goldwyn" },
+  { text: "Motivation is what gets you started. Habit is what keeps you going.", author: "Jim Ryun" },
+  { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+  { text: "Focus on being productive instead of busy.", author: "Tim Ferriss" },
+  { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
+  { text: "Small progress is still progress.", author: "Unknown" },
+  { text: "Do something today that your future self will thank you for.", author: "Sean Patrick Flanery" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+  { text: "A year from now you may wish you had started today.", author: "Karen Lamb" },
+  { text: "Done is better than perfect.", author: "Sheryl Sandberg" }
+];
+
+function newQuote() {
+  let random = quotes[Math.floor(Math.random() * quotes.length)];
+  let textEl   = document.getElementById("quoteText");
+  let authorEl = document.getElementById("quoteAuthor");
+
+  textEl.style.opacity   = "0";
+  authorEl.style.opacity = "0";
+
+  setTimeout(() => {
+    textEl.textContent   = '"' + random.text + '"';
+    authorEl.textContent = "— " + random.author;
+    textEl.style.transition   = "opacity 0.4s"; 
+    authorEl.style.transition = "opacity 0.4s";
+    textEl.style.opacity   = "1";
+    authorEl.style.opacity = "1";
+  }, 200);
+}
+
+newQuote();
+renderAll();
+updateXpBar();
+renderPomoDisplay();
+renderPomoDots();
+</script>
+</body>
+</html>
